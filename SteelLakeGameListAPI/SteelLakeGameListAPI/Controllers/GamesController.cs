@@ -9,10 +9,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
+using Newtonsoft.Json;
+using System.Net;
+using System.Net.Http;
 
 namespace SteelLakeGameListAPI.Controllers
 {
-    public class GamesController
+    public class GamesController : Controller
     {
         private IMapGames _mapper;
         private readonly IDistributedCache _distributedCache;
@@ -27,41 +30,70 @@ namespace SteelLakeGameListAPI.Controllers
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<GetAGameResponse>> GetGameById(Guid id)
         {
+            var key = $"game#{id}";
+            var value = await _distributedCache.GetStringAsync(key);
 
-            GetAGameResponse response = await _mapper.GetGameById(id);
+            GetAGameResponse response;
 
-            var options = new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddSeconds(45));
-            //var key = $"game#{id}";
-            //var encodedResponse = 
-            //await _distributedCache.SetAsync(key,response.)
-
-            if (response == null)
+            if (value != null)
             {
-                return new NotFoundResult();
+                response = JsonConvert.DeserializeObject<GetAGameResponse>(value);
             }
             else
             {
-                return new OkObjectResult(response);
+                response = await _mapper.GetGameById(id);
+                if (response == null)
+                {
+                    return NotFound();
+                }
+                var options = new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddSeconds(60));
+                var serializedReponse = JsonConvert.SerializeObject(response);
+                await _distributedCache.SetStringAsync(key, serializedReponse, options);
+
+            }
+            return Ok(response);
+        }
+
+        [HttpGet("games", Name = "games#getallgames")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ResponseCache(Duration = 30, Location = ResponseCacheLocation.Any)]
+        public async Task<ActionResult<GetGamesResponse>> GetAllGames()
+        {
+            var key = "allGames";
+            var value = await _distributedCache.GetStringAsync(key);
+
+            GetGamesResponse response;
+
+            if (value != null)
+            {
+                response = JsonConvert.DeserializeObject<GetGamesResponse>(value);
+            }
+            else
+            {
+                response = await _mapper.GetAllGames();
+                if(response == null)
+                {
+                    return NotFound();
+                }
+                var options = new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddSeconds(30));
+                var serializedResponse = JsonConvert.SerializeObject(response);
+                await _distributedCache.SetStringAsync(key, serializedResponse, options);
             }
 
-            
-            //var time = await Cache.GetAsync("time");
-            //string newTime = null;
-            //if (time == null)
-            //{
-            //    newTime = DateTime.Now.ToLongTimeString();
-            //    var encodedTime = Encoding.UTF8.GetBytes(newTime);
-            //    var options = new DistributedCacheEntryOptions()
-            //        .SetAbsoluteExpiration(DateTime.Now.AddSeconds(15));
-            //    await Cache.SetAsync("time", encodedTime, options);
-            //}
-            //else
-            //{
-            //    newTime = Encoding.UTF8.GetString(time);
-            //}
-            //return Ok($"Ok, it is now {newTime}");
+            return Ok(response);
         }
+
+        //[HttpPost("games", Name = "games#addagame")]
+        //[ProducesResponseType(StatusCodes.Status201Created)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //public async Task<ActionResult> AddAGame([FromBody] PostGamesRequest request)
+        //{
+            
+        //}
     }
 }

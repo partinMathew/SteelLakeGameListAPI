@@ -13,6 +13,7 @@ namespace LibraryApi.Profiles
         public GameProfile()
         {
             CreateMap<Game, GetAGameResponse>();
+            CreateMap<Game, GameSummaryItem>();
         }
     }
 }

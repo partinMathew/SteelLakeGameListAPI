@@ -20,6 +20,17 @@ namespace SteelLakeGameListAPI.Mappers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        public async Task<GetGamesResponse> GetAllGames()
+        {
+            GetGamesResponse response = new GetGamesResponse
+            {
+                Data = await _context.Games.Select(g => _mapper.Map<GameSummaryItem>(g)).ToListAsync()
+            };
+            response.TotalGames = response.Data.Count;
+
+            return response;
+        }
+
         public async Task<GetAGameResponse> GetGameById(Guid id)
         {
             var response = await _context.Games
@@ -28,11 +39,5 @@ namespace SteelLakeGameListAPI.Mappers
             .SingleOrDefaultAsync();
             return response;
         }
-
-
-        //public async Task<GetGamesResponse> GetAllGames()
-        //{
-        //    var response = await _context.Games.Select(g => _mapper.Map<GameSummaryItem>(g)).ToListAsync();
-        //}
     }
 }

@@ -9,5 +9,6 @@ namespace SteelLakeGameListAPI.Mappers
     public interface IMapGames
     {
         Task<GetAGameResponse> GetGameById(Guid id);
+        Task<GetGamesResponse> GetAllGames();
     }
 }

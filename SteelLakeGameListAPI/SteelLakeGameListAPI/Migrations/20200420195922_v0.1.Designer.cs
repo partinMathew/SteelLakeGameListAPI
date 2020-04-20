@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SteelLakeGameListAPI.Domain;
 
 namespace SteelLakeGameListAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200420195922_v0.1")]
+    partial class v01
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,9 +31,6 @@ namespace SteelLakeGameListAPI.Migrations
                         .HasColumnType("nvarchar(1500)")
                         .HasMaxLength(1500);
 
-                    b.Property<Guid?>("Expansions")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
@@ -40,8 +39,6 @@ namespace SteelLakeGameListAPI.Migrations
                         .HasMaxLength(200);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Expansions");
 
                     b.ToTable("Expansions");
                 });
@@ -91,32 +88,13 @@ namespace SteelLakeGameListAPI.Migrations
                         .HasColumnType("nvarchar(1500)")
                         .HasMaxLength(1500);
 
-                    b.Property<Guid?>("Mods")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Mods");
-
                     b.ToTable("Mods");
-                });
-
-            modelBuilder.Entity("SteelLakeGameListAPI.Domain.Expansion", b =>
-                {
-                    b.HasOne("SteelLakeGameListAPI.Domain.Game", null)
-                        .WithMany("Expansions")
-                        .HasForeignKey("Expansions");
-                });
-
-            modelBuilder.Entity("SteelLakeGameListAPI.Domain.Mod", b =>
-                {
-                    b.HasOne("SteelLakeGameListAPI.Domain.Game", null)
-                        .WithMany("Mods")
-                        .HasForeignKey("Mods");
                 });
 #pragma warning restore 612, 618
         }

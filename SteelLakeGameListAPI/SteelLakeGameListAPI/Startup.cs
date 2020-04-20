@@ -38,7 +38,7 @@ namespace SteelLakeGameListAPI
             );
             services.AddDistributedRedisCache(option =>
             {
-                option.Configuration = "127.0.0.1";
+                option.Configuration = Configuration.GetValue<string>("redisHost"); 
                 option.InstanceName = "master";
             });
         }
