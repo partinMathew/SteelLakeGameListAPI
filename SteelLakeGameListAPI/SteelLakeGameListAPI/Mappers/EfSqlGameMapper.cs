@@ -28,5 +28,11 @@ namespace SteelLakeGameListAPI.Mappers
             .SingleOrDefaultAsync();
             return response;
         }
+
+
+        //public async Task<GetGamesResponse> GetAllGames()
+        //{
+        //    var response = await _context.Games.Select(g => _mapper.Map<GameSummaryItem>(g)).ToListAsync();
+        //}
     }
 }

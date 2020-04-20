@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using AutoMapper;
 using SteelLakeGameListAPI.Domain;
 using Microsoft.EntityFrameworkCore;
+using SteelLakeGameListAPI.Mappers;
 
 namespace SteelLakeGameListAPI
 {
@@ -30,9 +31,16 @@ namespace SteelLakeGameListAPI
         {
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
+            services.AddScoped<IMapGames, EfSqlGameMapper>();
+            services.AddControllers();
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("SteelLakeAppDatabase"))
             );
+            services.AddDistributedRedisCache(option =>
+            {
+                option.Configuration = "127.0.0.1";
+                option.InstanceName = "master";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
