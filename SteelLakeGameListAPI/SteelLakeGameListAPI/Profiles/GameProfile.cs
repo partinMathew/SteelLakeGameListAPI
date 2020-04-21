@@ -14,6 +14,10 @@ namespace LibraryApi.Profiles
         {
             CreateMap<Game, GetAGameResponse>();
             CreateMap<Game, GameSummaryItem>();
+            CreateMap<PostGameRequest, Game>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
+            CreateMap<UpdateGameRequest, Game>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
         }
     }
 }

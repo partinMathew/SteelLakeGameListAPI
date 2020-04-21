@@ -7,6 +7,7 @@ namespace SteelLakeGameListAPI.Models
 {
     public class GetAGameResponse
     {
+        public Guid Id { get; set; }
         public string Title { get; set; }
         public int MinNumberOfPlayers { get; set; }
         public int? MaxNumberOfPlayers { get; set; }

@@ -14,6 +14,9 @@ using AutoMapper;
 using SteelLakeGameListAPI.Domain;
 using Microsoft.EntityFrameworkCore;
 using SteelLakeGameListAPI.Mappers;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System.IO;
 
 namespace SteelLakeGameListAPI
 {
@@ -41,6 +44,26 @@ namespace SteelLakeGameListAPI
                 option.Configuration = Configuration.GetValue<string>("redisHost"); 
                 option.InstanceName = "master";
             });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Steel Lake Games List API",
+                    Version = "1.0",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Mat Partin",
+                        Email = "partinmathew@gmail.com"
+                    },
+                    Description = "Internal api used for project for discord server to list games that we play."
+
+                });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+
+
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,7 +75,13 @@ namespace SteelLakeGameListAPI
             }
 
             app.UseHttpsRedirection();
-
+            app.UseSwagger();
+            app.UseResponseCaching();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Library API");
+                c.RoutePrefix = "docs";
+            });
             app.UseRouting();
 
             app.UseAuthorization();

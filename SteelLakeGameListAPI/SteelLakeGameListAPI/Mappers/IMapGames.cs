@@ -10,5 +10,8 @@ namespace SteelLakeGameListAPI.Mappers
     {
         Task<GetAGameResponse> GetGameById(Guid id);
         Task<GetGamesResponse> GetAllGames();
+        Task<GetAGameResponse> AddAGame(PostGameRequest request);
+        Task Remove(Guid id);
+        Task<bool> UpdateGame(Guid id, UpdateGameRequest request);
     }
 }
