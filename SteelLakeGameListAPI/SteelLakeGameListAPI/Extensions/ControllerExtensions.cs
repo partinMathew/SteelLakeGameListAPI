@@ -8,7 +8,7 @@ namespace SteelLakeGameListAPI.Extensions
 {
     public static class ControllerExtensions
     {
-        public static ActionResult Either<T, F>(this Controller controller, bool condition)
+        public static ActionResult Either<T, F>(this ControllerBase controller, bool condition)
                 where T : ActionResult, new()
                 where F : ActionResult, new()
         {

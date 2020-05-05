@@ -13,19 +13,25 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http;
 using SteelLakeGameListAPI.Extensions;
+using Amazon.Runtime.Internal.Util;
+using Microsoft.Extensions.Logging;
 
 namespace SteelLakeGameListAPI.Controllers
 {
-    public class GamesController : Controller
+    public class GamesController : ControllerBase
     {
         private IMapGames _mapper;
         private readonly IDistributedCache _distributedCache;
+        private readonly ILogger<GamesController> _logger;
 
-        public GamesController(IMapGames mapper, IDistributedCache distributedCache)
+        public GamesController(IMapGames mapper, IDistributedCache distributedCache, ILogger<GamesController> logger)
         {
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
+
 
 
         /// <summary>
@@ -75,6 +81,7 @@ namespace SteelLakeGameListAPI.Controllers
         [ResponseCache(Duration = 30, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<GetGamesResponse>> GetAllGames()
         {
+            _logger.LogDebug("test");
             var key = "allGames";
             var value = await _distributedCache.GetStringAsync(key);
 

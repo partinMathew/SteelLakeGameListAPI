@@ -17,6 +17,7 @@ using SteelLakeGameListAPI.Mappers;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.IO;
+using Serilog;
 
 namespace SteelLakeGameListAPI
 {
