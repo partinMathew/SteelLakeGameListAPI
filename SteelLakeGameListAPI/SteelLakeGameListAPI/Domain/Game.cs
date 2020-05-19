@@ -19,10 +19,7 @@ namespace SteelLakeGameListAPI.Domain
         public string GameLength { get; set; }
         public double Price { get; set; }
         public string Description { get; set; }
-
-        [ForeignKey("Expansions")]
-        public virtual List<Expansion> Expansions { get; set; }
-        [ForeignKey("Mods")]
-        public virtual List<Mod> Mods { get; set; }
+        public virtual ICollection<Expansion> Expansions { get; set; }
+        public virtual ICollection<Mod> Mods { get; set; }
     }
 }

@@ -18,13 +18,13 @@ using Microsoft.Extensions.Logging;
 
 namespace SteelLakeGameListAPI.Controllers
 {
-    public class GamesController : ControllerBase
+    public class GamesController : GamesListControllerBase
     {
         private IMapGames _mapper;
         private readonly IDistributedCache _distributedCache;
         private readonly ILogger<GamesController> _logger;
 
-        public GamesController(IMapGames mapper, IDistributedCache distributedCache, ILogger<GamesController> logger)
+        public GamesController(IMapGames mapper, IDistributedCache distributedCache, ILogger<GamesController> logger) : base(distributedCache)
         {
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
@@ -62,9 +62,7 @@ namespace SteelLakeGameListAPI.Controllers
                 {
                     return NotFound();
                 }
-                var options = new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddSeconds(60));
-                var serializedReponse = JsonConvert.SerializeObject(response);
-                await _distributedCache.SetStringAsync(key, serializedReponse, options);
+                await CacheResponse(key, 60, response);
 
             }
             return Ok(response);
@@ -98,9 +96,8 @@ namespace SteelLakeGameListAPI.Controllers
                 {
                     return NotFound();
                 }
-                var options = new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddSeconds(30));
-                var serializedResponse = JsonConvert.SerializeObject(response);
-                await _distributedCache.SetStringAsync(key, serializedResponse, options);
+
+                await CacheResponse(key, 30, response);
             }
 
             return Ok(response);
@@ -122,9 +119,9 @@ namespace SteelLakeGameListAPI.Controllers
             
             // We can cache this object for subsequent GET requests for the same object
             var key = $"game#{response.Id}";
-            var options = new DistributedCacheEntryOptions().SetAbsoluteExpiration(DateTime.Now.AddSeconds(150)); //Can cache this for longer, as it is a brand new object, and less likely to change
-            var serializedResponse = JsonConvert.SerializeObject(response);
-            await _distributedCache.SetStringAsync(key, serializedResponse, options);
+            await CacheResponse(key, 150, response);
+            _logger.LogInformation("Added game to database: " + request.Title);
+
 
             return CreatedAtRoute("games#getagame", new { id = response.Id }, response);
         }
@@ -139,6 +136,9 @@ namespace SteelLakeGameListAPI.Controllers
         {
             await _mapper.Remove(id);
             await _distributedCache.RemoveAsync($"game#{id}");
+
+            _logger.LogInformation("Removed game with id " + id.ToString());
+
             return NoContent();
         }
 

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SteelLakeGameListAPI.Domain;
 
 namespace SteelLakeGameListAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200519213913_Updated Mod System")]
+    partial class UpdatedModSystem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,7 +31,7 @@ namespace SteelLakeGameListAPI.Migrations
                         .HasColumnType("nvarchar(1500)")
                         .HasMaxLength(1500);
 
-                    b.Property<Guid?>("GameId")
+                    b.Property<Guid?>("Expansions")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<double>("Price")
@@ -41,7 +43,7 @@ namespace SteelLakeGameListAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GameId");
+                    b.HasIndex("Expansions");
 
                     b.ToTable("Expansions");
                 });
@@ -91,9 +93,6 @@ namespace SteelLakeGameListAPI.Migrations
                         .HasColumnType("nvarchar(1500)")
                         .HasMaxLength(1500);
 
-                    b.Property<Guid?>("GameId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("GameLength")
                         .HasColumnType("nvarchar(max)");
 
@@ -102,6 +101,9 @@ namespace SteelLakeGameListAPI.Migrations
 
                     b.Property<int?>("MinNumberOfPlayers")
                         .HasColumnType("int");
+
+                    b.Property<Guid?>("Mods")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("RecommendedNumberOfPlayers")
                         .HasColumnType("int");
@@ -112,7 +114,7 @@ namespace SteelLakeGameListAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GameId");
+                    b.HasIndex("Mods");
 
                     b.ToTable("Mods");
                 });
@@ -121,14 +123,14 @@ namespace SteelLakeGameListAPI.Migrations
                 {
                     b.HasOne("SteelLakeGameListAPI.Domain.Game", null)
                         .WithMany("Expansions")
-                        .HasForeignKey("GameId");
+                        .HasForeignKey("Expansions");
                 });
 
             modelBuilder.Entity("SteelLakeGameListAPI.Domain.Mod", b =>
                 {
-                    b.HasOne("SteelLakeGameListAPI.Domain.Game", "Game")
+                    b.HasOne("SteelLakeGameListAPI.Domain.Game", null)
                         .WithMany("Mods")
-                        .HasForeignKey("GameId");
+                        .HasForeignKey("Mods");
                 });
 #pragma warning restore 612, 618
         }

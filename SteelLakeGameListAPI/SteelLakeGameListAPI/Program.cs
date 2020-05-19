@@ -12,6 +12,7 @@ using Serilog.Events;
 using Serilog.Formatting.Compact;
 using Serilog.Sinks.SystemConsole.Themes;
 using SteelLakeGameListAPI.Domain;
+using Unity;
 
 namespace SteelLakeGameListAPI
 {
@@ -33,6 +34,7 @@ namespace SteelLakeGameListAPI
                .WriteTo.Console(
                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
                .CreateLogger();
+
 
             try
             {
