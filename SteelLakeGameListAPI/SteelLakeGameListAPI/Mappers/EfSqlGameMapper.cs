@@ -33,7 +33,7 @@ namespace SteelLakeGameListAPI.Mappers
         {
             GetGamesResponse response = new GetGamesResponse
             {
-                Data = await _context.Games.Select(g => _mapper.Map<GameSummaryItem>(g)).ToListAsync()
+                Data = await _context.Games.Include(g => g.Expansions).Include(g => g.Mods).Select(g => _mapper.Map<GameSummaryItem>(g)).ToListAsync()
             };
             response.TotalGames = response.Data.Count;
 
@@ -44,6 +44,8 @@ namespace SteelLakeGameListAPI.Mappers
         {
             var response = await _context.Games
             .Where(g => g.Id == id)
+            .Include(g => g.Expansions)
+            .Include(g => g.Mods)
             .Select(g => _mapper.Map<GetAGameResponse>(g))
             .SingleOrDefaultAsync();
             return response;

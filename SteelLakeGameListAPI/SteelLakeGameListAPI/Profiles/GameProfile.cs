@@ -12,8 +12,12 @@ namespace LibraryApi.Profiles
     {
         public GameProfile()
         {
-            CreateMap<Game, GetAGameResponse>();
-            CreateMap<Game, GameSummaryItem>();
+            CreateMap<Game, GetAGameResponse>()
+             .ForMember(dest => dest.NumberOfMods, opt => opt.MapFrom(src => src.Mods.Count))
+            .ForMember(dest => dest.NumberOfExpansions, opt => opt.MapFrom(src => src.Expansions.Count));
+            CreateMap<Game, GameSummaryItem>()
+            .ForMember(dest => dest.NumberOfMods, opt => opt.MapFrom(src => src.Mods.Count))
+            .ForMember(dest => dest.NumberOfExpansions, opt => opt.MapFrom(src => src.Expansions.Count));
             CreateMap<PostGameRequest, Game>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             CreateMap<UpdateGameRequest, Game>()

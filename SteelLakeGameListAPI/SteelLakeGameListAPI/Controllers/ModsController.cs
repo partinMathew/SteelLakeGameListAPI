@@ -98,6 +98,10 @@ namespace SteelLakeGameListAPI.Controllers
             else
             {
                 response = await _modsMapper.GetAMod(gameId, modId);
+                if (response == null)
+                {
+                    return NotFound();
+                }
                 await CacheResponse(key, 60, response);
             }
 
@@ -107,6 +111,7 @@ namespace SteelLakeGameListAPI.Controllers
         /// <summary>
         /// Add a mod to a game
         /// </summary>
+        /// <param name="gameId">The id of the game associated with mod you are adding</param>
         /// <param name="request">A mod to add to the database</param>
         /// <returns>The mod you created</returns>
         [HttpPost("games/{gameId:Guid}/mods", Name = "game-mods#addamod")]
@@ -156,7 +161,7 @@ namespace SteelLakeGameListAPI.Controllers
         [ValidateModel]
         public async Task<ActionResult> UpdateAMod(Guid gameId, Guid modId,  [FromBody] UpdateModRequest request)
         {
-            bool didUpdate = await _modsMapper.UpdateGame(gameId, modId, request);
+            bool didUpdate = await _modsMapper.UpdateMod(gameId, modId, request);
             return this.Either<NoContentResult, NotFoundResult>(didUpdate);
         }
 

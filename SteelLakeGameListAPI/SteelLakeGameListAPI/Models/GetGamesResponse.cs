@@ -7,7 +7,7 @@ namespace SteelLakeGameListAPI.Models
 {
     public class GetGamesResponse : HttpCollection<GameSummaryItem>
     {
-        public int TotalGames { get; set; } // TODO: what do I need in this object
+        public int TotalGames { get; set; }
     }
     public class GameSummaryItem
     {
@@ -19,5 +19,8 @@ namespace SteelLakeGameListAPI.Models
         public string GameLength { get; set; }
         public double Price { get; set; }
         public string Description { get; set; }
+
+        public int NumberOfMods { get; set; }
+        public int NumberOfExpansions { get; set; }
     }
 }

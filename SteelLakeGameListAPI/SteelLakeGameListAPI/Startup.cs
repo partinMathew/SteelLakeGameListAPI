@@ -37,6 +37,7 @@ namespace SteelLakeGameListAPI
             services.AddAutoMapper(typeof(Startup));
             services.AddScoped<IMapGames, EfSqlGameMapper>();
             services.AddScoped<IMapMods, EfSqlModMapper>();
+            services.AddScoped<IMapExpansions, EfSqlExpansionMapper>();
             services.AddControllers();
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("SteelLakeAppDatabase"))

@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SteelLakeGameListAPI.Domain
+namespace SteelLakeGameListAPI.Models
 {
-    public class Expansion
+    public class GetExpansionsResponse : HttpCollection<ExpansionSummaryItem>
+    {
+        public int TotalExpansions { get; set; }
+        public bool HasExpansions { get; set; }
+    }
+
+    public class ExpansionSummaryItem
     {
         public Guid Id { get; set; }
-        public Game Game { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public int? MinNumberOfPlayers { get; set; }

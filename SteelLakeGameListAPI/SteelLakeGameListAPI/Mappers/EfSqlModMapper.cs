@@ -67,7 +67,7 @@ namespace SteelLakeGameListAPI.Mappers
 
         }
 
-        public async Task<bool> UpdateGame(Guid gameId, Guid modId, UpdateModRequest request)
+        public async Task<bool> UpdateMod(Guid gameId, Guid modId, UpdateModRequest request)
         {
             Game originalGame = await _context.Games
                         .Where(g => g.Id == gameId).Include(g => g.Mods)
