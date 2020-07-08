@@ -14,6 +14,9 @@ namespace SteelLakeGameListAPI.Profiles
         {
             CreateMap<Mod, GetModsResponse>();
             CreateMap<Mod, ModSummaryItem>();
+            CreateMap<PostModRequest, Mod>();
+            CreateMap<Mod, GetAModResponse>();
+            CreateMap<UpdateModRequest, Mod>();
         }
     }
 }

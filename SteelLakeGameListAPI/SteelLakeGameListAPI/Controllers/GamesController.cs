@@ -144,7 +144,7 @@ namespace SteelLakeGameListAPI.Controllers
 
 
         /// <summary>
-        /// Updates a given game by <paramref name="id"/> with the new inforamtion you pass in <paramref name="request"/>
+        /// Updates a given game by <paramref name="id"/> with the new information you pass in <paramref name="request"/>
         /// </summary>
         /// <param name="id">The id of the game you wish to update</param>
         /// <param name="request">The updated object</param>
