@@ -19,16 +19,16 @@ namespace SteelLakeGameListAPI.Controllers
     {
         private IMapMods _modsMapper;
         private IMapGames _gamesMapper;
-        private readonly IDistributedCache _distributedCache;
         private readonly ILogger<ModsController> _logger;
 
-        public ModsController(IMapMods modsMapper, IMapGames gamesMapper, IDistributedCache distributedCache, ILogger<ModsController> logger) : base(distributedCache)
+        public ModsController(IMapMods modsMapper, IMapGames gamesMapper, ILogger<ModsController> logger)
         {
-            _modsMapper = modsMapper ?? throw new ArgumentNullException(nameof(modsMapper));
-            _gamesMapper = gamesMapper ?? throw new ArgumentNullException(nameof(gamesMapper));
-            _distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _modsMapper = modsMapper;
+            _gamesMapper = gamesMapper;
+            _logger = logger;
         }
+
+
 
 
         /// <summary>
@@ -49,21 +49,8 @@ namespace SteelLakeGameListAPI.Controllers
                 return NotFound();
             }
 
-            var key = $"game-mods#{gameId}";
-            var value = await _distributedCache.GetStringAsync(key);
-
-            GetModsResponse response;
-
-            if(value != null)
-            {
-                response = JsonConvert.DeserializeObject<GetModsResponse>(value);
-            }
-            else
-            {
-                response = await _modsMapper.GetModsByGameId(gameId);
-                await CacheResponse(key, 60, response);
-            }
-
+            GetModsResponse response = await _modsMapper.GetModsByGameId(gameId);
+            
             return Ok(response);
         }
 
@@ -86,25 +73,12 @@ namespace SteelLakeGameListAPI.Controllers
                 return NotFound();
             }
 
-            var key = $"game-mods#{gameId}%{modId}";
-            var value = await _distributedCache.GetStringAsync(key);
-
-            GetAModResponse response;
-
-            if (value != null)
+            GetAModResponse response = await _modsMapper.GetAMod(gameId, modId);
+            if (response == null)
             {
-                response = JsonConvert.DeserializeObject<GetAModResponse>(value);
+                return NotFound();
             }
-            else
-            {
-                response = await _modsMapper.GetAMod(gameId, modId);
-                if (response == null)
-                {
-                    return NotFound();
-                }
-                await CacheResponse(key, 60, response);
-            }
-
+           
             return Ok(response);
         }
 
@@ -122,9 +96,6 @@ namespace SteelLakeGameListAPI.Controllers
         {
             GetAModResponse response = await _modsMapper.AddAMod(gameId, request);
 
-            // We can cache this object for subsequent GET requests for the same object
-            var key = $"game-mods#{gameId}%{response.Id}";
-            await CacheResponse(key, 150, response);
             _logger.LogInformation("Added mod to database: " + request.Title + " Game ID: " + gameId);
 
 
@@ -141,7 +112,6 @@ namespace SteelLakeGameListAPI.Controllers
         public async Task<ActionResult> DeleteAMod(Guid gameId, Guid modId)
         {
             await _modsMapper.Remove(gameId, modId);
-            await _distributedCache.RemoveAsync($"game-mods#{gameId}%{modId}");
 
             _logger.LogInformation("Removed mod with id " + modId.ToString() + " Game Id: " + gameId);
 

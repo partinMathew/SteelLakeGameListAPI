@@ -42,11 +42,6 @@ namespace SteelLakeGameListAPI
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("SteelLakeAppDatabase"))
             );
-            services.AddDistributedRedisCache(option =>
-            {
-                option.Configuration = Configuration.GetValue<string>("redisHost"); 
-                option.InstanceName = "master";
-            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo

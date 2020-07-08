@@ -19,16 +19,19 @@ namespace SteelLakeGameListAPI.Controllers
     {
         private IMapExpansions _expansionsMapper;
         private IMapGames _gamesMapper;
-        private readonly IDistributedCache _distributedCache;
+       
         private readonly ILogger<ExpansionsController> _logger;
 
-        public ExpansionsController(IMapExpansions expansionsMapper, IMapGames gamesMapper, IDistributedCache distributedCache, ILogger<ExpansionsController> logger) : base(distributedCache)
+        public ExpansionsController(IMapExpansions expansionsMapper, IMapGames gamesMapper, ILogger<ExpansionsController> logger)
         {
-            _expansionsMapper = expansionsMapper ?? throw new ArgumentNullException(nameof(expansionsMapper));
-            _gamesMapper = gamesMapper ?? throw new ArgumentNullException(nameof(gamesMapper));
-            _distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _expansionsMapper = expansionsMapper;
+            _gamesMapper = gamesMapper;
+            _logger = logger;
         }
+
+
+
+
 
 
         /// <summary>
@@ -49,21 +52,8 @@ namespace SteelLakeGameListAPI.Controllers
                 return NotFound();
             }
 
-            var key = $"game-expansions#{gameId}";
-            var value = await _distributedCache.GetStringAsync(key);
-
-            GetExpansionsResponse response;
-
-            if (value != null)
-            {
-                response = JsonConvert.DeserializeObject<GetExpansionsResponse>(value);
-            }
-            else
-            {
-                response = await _expansionsMapper.GetExpansionsByGameId(gameId);
-                await CacheResponse(key, 60, response);
-            }
-
+            GetExpansionsResponse response = await _expansionsMapper.GetExpansionsByGameId(gameId);                
+            
             return Ok(response);
         }
 
@@ -86,24 +76,12 @@ namespace SteelLakeGameListAPI.Controllers
                 return NotFound();
             }
 
-            var key = $"game-expansions#{gameId}%{expansionId}";
-            var value = await _distributedCache.GetStringAsync(key);
-
-            GetAnExpansionResponse response;
-
-            if (value != null)
+            GetAnExpansionResponse response = await _expansionsMapper.GetAnExpansion(gameId, expansionId);
+            if (response == null)
             {
-                response = JsonConvert.DeserializeObject<GetAnExpansionResponse>(value);
+                return NotFound();
             }
-            else
-            {
-                response = await _expansionsMapper.GetAnExpansion(gameId, expansionId);
-                if (response == null)
-                {
-                    return NotFound();
-                }
-                await CacheResponse(key, 60, response);
-            }
+           
 
             return Ok(response);
         }
@@ -121,10 +99,7 @@ namespace SteelLakeGameListAPI.Controllers
         public async Task<ActionResult> AddAnExpansion(Guid gameId, [FromBody] PostExpansionRequest request)
         {
             GetAnExpansionResponse response = await _expansionsMapper.AddAnExpansion(gameId, request);
-
-            // We can cache this object for subsequent GET requests for the same object
-            var key = $"game-expansions#{gameId}%{response.Id}";
-            await CacheResponse(key, 150, response);
+            
             _logger.LogInformation("Added expansion to database: " + request.Title + " Game ID: " + gameId);
 
 
@@ -141,7 +116,6 @@ namespace SteelLakeGameListAPI.Controllers
         public async Task<ActionResult> DeleteAnExpansion(Guid gameId, Guid expansionId)
         {
             await _expansionsMapper.Remove(gameId, expansionId);
-            await _distributedCache.RemoveAsync($"game-expansions#{gameId}%{expansionId}");
 
             _logger.LogInformation("Removed expansion with id " + expansionId.ToString() + " Game Id: " + gameId);
 

@@ -21,15 +21,15 @@ namespace SteelLakeGameListAPI.Controllers
     public class GamesController : GamesListControllerBase
     {
         private IMapGames _mapper;
-        private readonly IDistributedCache _distributedCache;
+       
         private readonly ILogger<GamesController> _logger;
 
-        public GamesController(IMapGames mapper, IDistributedCache distributedCache, ILogger<GamesController> logger) : base(distributedCache)
+        public GamesController(IMapGames mapper, ILogger<GamesController> logger)
         {
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mapper = mapper;
+            _logger = logger;
         }
+
 
 
 
@@ -46,25 +46,12 @@ namespace SteelLakeGameListAPI.Controllers
         [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<GetAGameResponse>> GetGameById(Guid id)
         {
-            var key = $"game#{id}";
-            var value = await _distributedCache.GetStringAsync(key);
-
-            GetAGameResponse response;
-
-            if (value != null)
+            GetAGameResponse response = await _mapper.GetGameById(id);
+            if (response == null)
             {
-                response = JsonConvert.DeserializeObject<GetAGameResponse>(value);
+                return NotFound();
             }
-            else
-            {
-                response = await _mapper.GetGameById(id);
-                if (response == null)
-                {
-                    return NotFound();
-                }
-                await CacheResponse(key, 60, response);
-
-            }
+            
             return Ok(response);
         }
 
@@ -79,25 +66,10 @@ namespace SteelLakeGameListAPI.Controllers
         [ResponseCache(Duration = 30, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<GetGamesResponse>> GetAllGames()
         {
-            _logger.LogDebug("test");
-            var key = "allGames";
-            var value = await _distributedCache.GetStringAsync(key);
-
-            GetGamesResponse response;
-
-            if (value != null)
+            GetGamesResponse response = await _mapper.GetAllGames();
+            if(response == null)
             {
-                response = JsonConvert.DeserializeObject<GetGamesResponse>(value);
-            }
-            else
-            {
-                response = await _mapper.GetAllGames();
-                if(response == null)
-                {
-                    return NotFound();
-                }
-
-                await CacheResponse(key, 30, response);
+                return NotFound();
             }
 
             return Ok(response);
@@ -117,9 +89,6 @@ namespace SteelLakeGameListAPI.Controllers
         {
             GetAGameResponse response = await _mapper.AddAGame(request);
             
-            // We can cache this object for subsequent GET requests for the same object
-            var key = $"game#{response.Id}";
-            await CacheResponse(key, 150, response);
             _logger.LogInformation("Added game to database: " + request.Title);
 
 
@@ -135,7 +104,6 @@ namespace SteelLakeGameListAPI.Controllers
         public async Task<ActionResult> DeleteAGame(Guid id)
         {
             await _mapper.Remove(id);
-            await _distributedCache.RemoveAsync($"game#{id}");
 
             _logger.LogInformation("Removed game with id " + id.ToString());
 
