@@ -9,5 +9,6 @@ namespace SteelLakeGameListAPI.Mappers
     public interface IMapMods
     {
         Task<GetModsResponse> GetModsByGameId(Guid gameId);
+        Task<GetAModResponse> GetAMod(Guid gameId, Guid modId);
     }
 }

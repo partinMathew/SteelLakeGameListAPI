@@ -20,11 +20,22 @@ namespace SteelLakeGameListAPI.Mappers
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        public async Task<GetAModResponse> GetAMod(Guid gameId, Guid modId)
+        {
+            var game = await _context.Games.Where(g => g.Id == gameId).Include(g => g.Mods).FirstOrDefaultAsync();
+
+            GetAModResponse response = _mapper.Map<GetAModResponse>(game.Mods.Select(m => m.Id == modId));
+            
+            return response;
+        }
+
         public async Task<GetModsResponse> GetModsByGameId(Guid gameId)
         {
+            var game = await _context.Games.Where(g => g.Id == gameId).Include(g => g.Mods).FirstOrDefaultAsync();
+
             GetModsResponse response = new GetModsResponse
             {
-                Data = await _context.Games.Where(g => g.Id == gameId).Select(g => _mapper.Map<ModSummaryItem>(g.Mods)).ToListAsync()
+                Data = _mapper.Map<ICollection<Mod>, List<ModSummaryItem>>(game.Mods)
             };
             response.TotalMods = response.Data.Count;
             response.HasMods = response.Data.Count >= 1;

@@ -13,6 +13,7 @@ namespace SteelLakeGameListAPI.Profiles
         public ModProfile()
         {
             CreateMap<Mod, GetModsResponse>();
+            CreateMap<Mod, ModSummaryItem>();
         }
     }
 }
