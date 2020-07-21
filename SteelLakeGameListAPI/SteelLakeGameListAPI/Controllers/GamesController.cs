@@ -1,19 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
 using SteelLakeGameListAPI.Mappers;
 using SteelLakeGameListAPI.Models;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Text;
-using Newtonsoft.Json;
-using System.Net;
-using System.Net.Http;
 using SteelLakeGameListAPI.Extensions;
-using Amazon.Runtime.Internal.Util;
 using Microsoft.Extensions.Logging;
 
 namespace SteelLakeGameListAPI.Controllers

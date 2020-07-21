@@ -17,7 +17,7 @@ using SteelLakeGameListAPI.Mappers;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.IO;
-using Serilog;
+using SteelLakeGameListAPI.Extensions;
 
 namespace SteelLakeGameListAPI
 {
@@ -42,6 +42,8 @@ namespace SteelLakeGameListAPI
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("SteelLakeAppDatabase"))
             );
+           
+            
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo

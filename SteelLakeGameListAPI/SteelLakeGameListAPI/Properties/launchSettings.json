@@ -15,7 +15,8 @@
       "launchUrl": "docs",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "ancmHostingModel": "InProcess"
     },
     "SteelLakeGameListAPI": {
       "commandName": "Project",
