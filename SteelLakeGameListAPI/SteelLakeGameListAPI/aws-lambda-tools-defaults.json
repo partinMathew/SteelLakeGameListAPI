@@ -1,0 +1,8 @@
+
+{
+    "region" : "us-east-2",
+    "profile" : "root",
+    "s3-bucket" : "steel-lake-game-list-api",
+    "template"  : "serverless.template",
+    "stack-name" : "steel-lake-game-list-api"
+}

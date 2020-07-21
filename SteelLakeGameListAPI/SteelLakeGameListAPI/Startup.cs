@@ -79,7 +79,7 @@ namespace SteelLakeGameListAPI
             app.UseResponseCaching();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Library API");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Steel Lake Game List API");
                 c.RoutePrefix = "docs";
             });
             app.UseRouting();
