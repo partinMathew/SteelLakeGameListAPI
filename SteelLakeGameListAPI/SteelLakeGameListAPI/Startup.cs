@@ -77,6 +77,12 @@ namespace SteelLakeGameListAPI
             app.UseHttpsRedirection();
             app.UseSwagger();
             app.UseResponseCaching();
+            app.UseCors(options =>
+            {
+                options.AllowAnyOrigin();
+                options.AllowAnyMethod();
+                options.AllowAnyHeader();
+            });
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Steel Lake Game List API");
